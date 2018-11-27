@@ -29,9 +29,8 @@ CCorrelation::CCorrelation(std::shared_ptr<CSite> correlationSite,
 							double orgZ, double corrVal) {
 	clear();
 
-	initialize(correlationSite, correlationTime,
-				correlationIdString, phase, orgTime, orgLat, orgLon, orgZ,
-				corrVal);
+	initialize(correlationSite, correlationTime, correlationIdString, phase,
+				orgTime, orgLat, orgLon, orgZ, corrVal);
 }
 
 // ---------------------------------------------------------CCorrelation
@@ -144,8 +143,8 @@ CCorrelation::CCorrelation(std::shared_ptr<json::Object> correlation,
 
 	// check to see if we got a site
 	if (site == NULL) {
-		glass3::util::Logger::log("warning",
-								"CCorrelation::CCorrelation: site is null.");
+		glass3::util::Logger::log(
+				"warning", "CCorrelation::CCorrelation: site is null.");
 
 		return;
 	}
@@ -282,8 +281,7 @@ CCorrelation::CCorrelation(std::shared_ptr<json::Object> correlation,
 	}
 
 	// pass to initialization function
-	if (!initialize(site, tcorr, pid, phs, tori, lat, lon, z,
-					corr)) {
+	if (!initialize(site, tcorr, pid, phs, tori, lat, lon, z, corr)) {
 		glass3::util::Logger::log(
 				"error",
 				"CCorrelation::CCorrelation: Failed to initialize correlation.");
@@ -291,7 +289,7 @@ CCorrelation::CCorrelation(std::shared_ptr<json::Object> correlation,
 		return;
 	}
 
-	std::lock_guard<std::recursive_mutex> guard(m_CorrelationMutex);
+	std::lock_guard < std::recursive_mutex > guard(m_CorrelationMutex);
 
 	// remember input json for hypo message generation
 	// note move to init?
@@ -304,7 +302,7 @@ CCorrelation::~CCorrelation() {
 
 // ---------------------------------------------------------clear
 void CCorrelation::clear() {
-	std::lock_guard<std::recursive_mutex> guard(m_CorrelationMutex);
+	std::lock_guard < std::recursive_mutex > guard(m_CorrelationMutex);
 
 	m_wpSite.reset();
 	m_wpHypo.reset();
@@ -331,7 +329,7 @@ bool CCorrelation::initialize(std::shared_ptr<CSite> correlationSite,
 								double corrVal) {
 	clear();
 
-	std::lock_guard<std::recursive_mutex> guard(m_CorrelationMutex);
+	std::lock_guard < std::recursive_mutex > guard(m_CorrelationMutex);
 
 	m_wpSite = correlationSite;
 	m_sPhaseName = phase;
@@ -346,6 +344,10 @@ bool CCorrelation::initialize(std::shared_ptr<CSite> correlationSite,
 
 	m_dCorrelation = corrVal;
 
+	// Setup nucleation value and pick worth
+	m_nucleationWeight = corrVal * CGlass::getMaxCorrelationValue();
+	m_pickWorth = (int) m_nucleationWeight;
+
 	// nullcheck
 	if (correlationSite == NULL) {
 		return (false);
@@ -356,13 +358,12 @@ bool CCorrelation::initialize(std::shared_ptr<CSite> correlationSite,
 
 // ---------------------------------------------------------addHypo
 void CCorrelation::addHypoReference(std::shared_ptr<CHypo> hyp, bool force) {
-	std::lock_guard<std::recursive_mutex> guard(m_CorrelationMutex);
+	std::lock_guard < std::recursive_mutex > guard(m_CorrelationMutex);
 
 	// nullcheck
 	if (hyp == NULL) {
 		glass3::util::Logger::log(
-				"error",
-				"CCorrelation::addHypo: NULL hypo " "provided.");
+				"error", "CCorrelation::addHypo: NULL hypo " "provided.");
 		return;
 	}
 
@@ -378,8 +379,8 @@ void CCorrelation::addHypoReference(std::shared_ptr<CHypo> hyp, bool force) {
 void CCorrelation::removeHypoReference(std::shared_ptr<CHypo> hyp) {
 	// nullcheck
 	if (hyp == NULL) {
-		glass3::util::Logger::log("error",
-								"CCorrelation::remHypo: NULL hypo provided.");
+		glass3::util::Logger::log(
+				"error", "CCorrelation::remHypo: NULL hypo provided.");
 		return;
 	}
 
@@ -388,7 +389,7 @@ void CCorrelation::removeHypoReference(std::shared_ptr<CHypo> hyp) {
 
 // ---------------------------------------------------------removeHypo
 void CCorrelation::removeHypoReference(std::string pid) {
-	std::lock_guard<std::recursive_mutex> guard(m_CorrelationMutex);
+	std::lock_guard < std::recursive_mutex > guard(m_CorrelationMutex);
 
 	// is the pointer still valid
 	if (auto pHypo = m_wpHypo.lock()) {
@@ -404,7 +405,7 @@ void CCorrelation::removeHypoReference(std::string pid) {
 
 // ---------------------------------------------------------clearHypo
 void CCorrelation::clearHypoReference() {
-	std::lock_guard<std::recursive_mutex> guard(m_CorrelationMutex);
+	std::lock_guard < std::recursive_mutex > guard(m_CorrelationMutex);
 	m_wpHypo.reset();
 }
 
@@ -435,7 +436,7 @@ const std::shared_ptr<json::Object>& CCorrelation::getJSONCorrelation() const {
 
 // ---------------------------------------------------------getHypo
 const std::shared_ptr<CHypo> CCorrelation::getHypoReference() const {
-	std::lock_guard<std::recursive_mutex> guard(m_CorrelationMutex);
+	std::lock_guard < std::recursive_mutex > guard(m_CorrelationMutex);
 	return (m_wpHypo.lock());
 }
 
@@ -468,4 +469,15 @@ double CCorrelation::getTCreate() const {
 double CCorrelation::getTOrigin() const {
 	return (m_tOrigin);
 }
+
+// ---------------------------------------------------------getNucleationWorth
+double CCorrelation::getNucleationWeight() const {
+	return (m_nucleationWeight);
+}
+
+// ---------------------------------------------------------getPickWorth
+int CCorrelation::getPickWorth() const {
+return (m_pickWorth));
+}
+
 }  // namespace glasscore

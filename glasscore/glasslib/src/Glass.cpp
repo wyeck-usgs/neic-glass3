@@ -1399,4 +1399,22 @@ bool CGlass::getTestTravelTimes() {
 bool CGlass::getAllowPickUpdates() {
 	return (m_bAllowPickUpdates);
 }
+
+// Start correlation specific edits
+
+// ------------------------------------------------getAllowPickUpdates
+double CGlass::getMaxCorrelationValue() {
+	return ( m_correlationMaximumValue);
+}
+
+// ------------------------------------------------getAllowPickUpdates
+double CGlass::getCorrelationSpatialSTD() {
+	return (m_correlationSpatialSTD);
+}
+
+// ------------------------------------------------getAllowPickUpdates
+double CGlass::getMinimumCorrelationCoefficient() {
+	return (m_minimumCorrelationCoefficient);
+}
+
 }  // namespace glasscore

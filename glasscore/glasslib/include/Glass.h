@@ -407,6 +407,21 @@ class CGlass {
 	static bool getAllowPickUpdates();
 
 	/**
+	 * \brief Get the maximum value a correlation can be worth
+	 */
+	static double getMaxCorrelationValue();
+
+	/**
+	 * \brief Get the spatial standard deviation assigned to a correlation
+	 */
+	static double getCorrelationSpatial();
+
+	/**
+	 * \brief get the minimum allowable correlation coefficient
+	 */
+	static double getMinimumCorrelationCoefficient();
+
+	/**
 	 * \brief Gets a pointer to the Correlation list
 	 * \return Returns a pointer to the correlation list
 	 */
@@ -815,6 +830,26 @@ class CGlass {
 	 * \brief Default (disabled) maximum picks per hour
 	 */
 	static const int k_DefaultMaxPicksPerHour = k_nParamDisabled;
+
+	// Start Correlation Specific Edits
+	/**
+	 * \brief The maximum value a correlation will add to the nucleation stack
+	 * The actual value a correlation is worth is the correlation coefficent
+	 * multiplied by this value. The number of picks it is worth is this stack
+	 * value converted to an int.
+	 */
+	static std::atomic<double> m_correlationMaximumValue = 8.;
+
+	/**
+	 * \brief The spatial standard deviation for a correlation stack
+	 */
+	static std::atomic<double> m_correlationSpatialSTD = 5.;
+
+	/**
+	 * \brief The minimum allowable correlation coefficient
+	 */
+	static std::atomic<double> m_minimumCorrelationCoefficient = 0.;
+
 };
 }  // namespace glasscore
 #endif  // GLASS_H

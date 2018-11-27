@@ -273,6 +273,20 @@ class CCorrelation {
 	 */
 	double getTCreate() const;
 
+	/**
+	 * \brief Get the nucleation stack weight of this correlation
+	 * \return double with the nucleation weight of this event
+	 */
+	double getnucleationWeight() const;
+
+
+	/**
+	 * \brief get the number of picks this event is worth
+	 * \return return an int ofthe pick worth of this detection
+	 */
+	int getpickWorth() const;
+
+
  private:
 	/**
 	 * \brief A std::weak_ptr to a CSite object
@@ -327,9 +341,21 @@ class CCorrelation {
 	std::atomic<double> m_dDepth;
 
 	/**
-	 * \brief A double value containing this correlation's correlation value
+	 * \brief A double value containing this correlation's correlation
+	 * coefficient
 	 */
 	std::atomic<double> m_dCorrelation;
+
+	/**
+	 * \brief A double value containing what value the correlation adds
+	 * to the nucleation stack
+	 */
+	std::atomic<double> m_nucleationWeight;
+
+	/**
+	 * \brief A double value containing how many picks the correlation is worth
+	 */
+	std::atomic<int> m_pickWorth;
 
 	/**
 	 * \brief A double value containing the creation (insertion) time of the
